@@ -5,8 +5,12 @@
 package frc.robot.subsystems;
 
 import com.ThePinkAlliance.core.rev.SparkMax;
+import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Tank extends SubsystemBase {
@@ -18,19 +22,25 @@ public class Tank extends SubsystemBase {
   TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(12, 15),
       new TrapezoidProfile.State());
 
+  MotorControllerGroup left;
+  MotorControllerGroup right;
+  DifferentialDrive differentialDrive;
+
   /** Creates a new Tank. */
   public Tank() {
     this.left_front = new SparkMax(0, MotorType.kBrushed);
     this.left_back = new SparkMax(1, MotorType.kBrushed);
     this.right_front = new SparkMax(2, MotorType.kBrushed);
     this.right_back = new SparkMax(3, MotorType.kBrushed);
+
+    this.left = new MotorControllerGroup(left_back, left_front);
+    this.right = new MotorControllerGroup(right_back, right_front);
+
+    this.differentialDrive = new DifferentialDrive(left, right);
   }
 
   public void drive(double left, double right) {
-    this.left_back.set(left);
-    this.left_front.set(left);
-    this.right_back.set(right);
-    this.right_front.set(right);
+    this.differentialDrive.tankDrive(left, right);
   }
 
   public void drive(double pwr) {

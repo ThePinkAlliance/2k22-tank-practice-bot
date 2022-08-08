@@ -4,29 +4,20 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Watchdog;
+import com.ThePinkAlliance.core.joystick.JoystickAxis;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-public class CommandClimber extends CommandBase {
+public class JoystickClimber extends CommandBase {
   Climber m_climber;
-  Watchdog m_watchdog;
+  JoystickAxis m_axis;
 
-  double rotations;
-
-  /** Creates a new CommandClimber. */
-  public CommandClimber(Climber m_climber, double rotations) {
+  /** Creates a new JoystickClimber. */
+  public JoystickClimber(Climber m_climber, JoystickAxis m_axis) {
     // Use addRequirements() here to declare subsystem dependencies.
 
-    this.rotations = rotations;
+    this.m_axis = m_axis;
     this.m_climber = m_climber;
-
-    this.m_watchdog = new Watchdog(5, () -> {
-      m_climber.command(0);
-
-      System.out.println("[WATCHDOG]: TERMINATED CLIMBER, TARGET ROTATIONS: " + rotations + ", WATCHDOG LIMIT: "
-          + m_watchdog.getTimeout());
-    });
 
     addRequirements(m_climber);
   }
@@ -39,7 +30,11 @@ public class CommandClimber extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    this.m_climber.command(Math.copySign(m_climber.getPowerLimit(), rotations));
+    if (this.m_climber.getRotations() >= 0.2 && this.m_axis.get() == Math.copySign(this.m_axis.get(), 1)) {
+      this.m_climber.command(this.m_axis.get());
+    } else if (this.m_climber.getRotations() <= 0.2 && this.m_axis.get() == Math.copySign(this.m_axis.get(), -1)) {
+      this.m_climber.command(0);
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -51,6 +46,6 @@ public class CommandClimber extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.copySign(m_climber.getRotations(), rotations) >= rotations || m_watchdog.isExpired();
+    return false;
   }
 }

@@ -7,16 +7,12 @@ package frc.robot.subsystems;
 import com.ThePinkAlliance.core.ctre.talon.TalonUtils;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.WPI_CANCoder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -37,6 +33,7 @@ public class Climber extends SubsystemBase {
   BatterySim batterySim;
 
   final double POWER_LIMIT = 0.1;
+  final double MAX_ROTATIONS = 100;
 
   /** Creates a new Climbers. */
   public Climber(int talonId) {
@@ -46,11 +43,27 @@ public class Climber extends SubsystemBase {
   }
 
   public void command(double pwr) {
-    this.motor.set(ControlMode.PercentOutput, pwr * POWER_LIMIT);
+    if (getRotations() < MAX_ROTATIONS || getRotations() >= MAX_ROTATIONS && pwr == Math.copySign(pwr, -1)) {
+      this.motor.set(ControlMode.PercentOutput, pwr * POWER_LIMIT);
+    } else {
+      this.motor.set(ControlMode.PercentOutput, 0);
+    }
   }
 
   public double getRotations() {
     return (this.motor.getSelectedSensorPosition() / TalonUtils.FULL_TALON_ROTATION_TICKS) / gearRatio;
+  }
+
+  public double getTicks() {
+    return this.motor.getSelectedSensorPosition();
+  }
+
+  public double getPowerLimit() {
+    return this.POWER_LIMIT;
+  }
+
+  public double getMaxRotations() {
+    return this.MAX_ROTATIONS;
   }
 
   @Override

@@ -6,11 +6,16 @@ package frc.robot;
 
 import com.ThePinkAlliance.core.joystick.Joystick;
 import com.ThePinkAlliance.core.joystick.JoystickAxis;
+import com.ThePinkAlliance.core.joystick.Joystick.Axis;
+import com.ThePinkAlliance.core.joystick.Joystick.Buttons;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.CommandClimber;
+import frc.robot.commands.JoystickClimber;
 import frc.robot.commands.TankDrive;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Tank;
 
 /**
@@ -31,6 +36,9 @@ public class RobotContainer {
   private JoystickAxis right_x = new JoystickAxis(mainJS, Joystick.Axis.RIGHT_X);
 
   private final Tank m_tank = new Tank();
+
+  private final Climber m_climber_left = new Climber(11);
+  private final Climber m_climber_right = new Climber(10);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -56,6 +64,9 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     m_tank.setDefaultCommand(new TankDrive(m_tank, left_x, right_x));
+
+    m_climber_left.setDefaultCommand(new JoystickClimber(m_climber_left, mainJS.getAxis(Axis.LEFT_Y)));
+    m_climber_right.setDefaultCommand(new JoystickClimber(m_climber_right, mainJS.getAxis(Axis.RIGHT_Y)));
   }
 
   /**

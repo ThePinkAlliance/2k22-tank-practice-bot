@@ -5,9 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ThePinkAlliance.core.rev.SparkMax;
-import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
@@ -28,19 +26,24 @@ public class Tank extends SubsystemBase {
 
   /** Creates a new Tank. */
   public Tank() {
-    this.left_front = new SparkMax(0, MotorType.kBrushed);
-    this.left_back = new SparkMax(1, MotorType.kBrushed);
-    this.right_front = new SparkMax(2, MotorType.kBrushed);
-    this.right_back = new SparkMax(3, MotorType.kBrushed);
+    this.left_front = new SparkMax(22, MotorType.kBrushed);
+    this.left_back = new SparkMax(23, MotorType.kBrushed);
+    this.right_front = new SparkMax(20, MotorType.kBrushed);
+    this.right_back = new SparkMax(21, MotorType.kBrushed);
 
-    this.left = new MotorControllerGroup(left_back, left_front);
+    // this.left_front.setInverted(true);
+
+    this.left = new MotorControllerGroup(left_front, left_back);
     this.right = new MotorControllerGroup(right_back, right_front);
 
-    this.differentialDrive = new DifferentialDrive(left, right);
+    this.right.setInverted(true);
+
+    // this.differentialDrive = new DifferentialDrive(left, right);
   }
 
   public void drive(double left, double right) {
-    this.differentialDrive.tankDrive(left, right);
+    this.left.set(left);
+    this.right.set(right);
   }
 
   public void drive(double pwr) {
@@ -50,5 +53,7 @@ public class Tank extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    // this.differentialDrive.check();
+    // this.differentialDrive.checkMotors();
   }
 }

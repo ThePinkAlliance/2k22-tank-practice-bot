@@ -5,12 +5,16 @@
 package frc.robot.commands;
 
 import com.ThePinkAlliance.core.joystick.JoystickAxis;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Dashboard;
 import frc.robot.subsystems.Climber;
 
 public class JoystickClimber extends CommandBase {
   Climber m_climber;
   JoystickAxis m_axis;
+
+  double MAX_POSITION = 260000;
 
   /** Creates a new JoystickClimber. */
   public JoystickClimber(Climber m_climber, JoystickAxis m_axis) {
@@ -18,6 +22,15 @@ public class JoystickClimber extends CommandBase {
 
     this.m_axis = m_axis;
     this.m_climber = m_climber;
+
+    addRequirements(m_climber);
+  }
+
+  public JoystickClimber(Climber m_climber, JoystickAxis m_axis, double m_limit) {
+
+    this.m_axis = m_axis;
+    this.m_climber = m_climber;
+    this.MAX_POSITION = m_limit;
 
     addRequirements(m_climber);
   }
@@ -30,11 +43,23 @@ public class JoystickClimber extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (this.m_climber.getRotations() >= 0.2 && this.m_axis.get() == Math.copySign(this.m_axis.get(), 1)) {
-      this.m_climber.command(this.m_axis.get());
-    } else if (this.m_climber.getRotations() <= 0.2 && this.m_axis.get() == Math.copySign(this.m_axis.get(), -1)) {
-      this.m_climber.command(0);
-    }
+    // if (Math.abs(m_climber.getTicks()) <= MAX_POSITION
+    // || Math.abs(m_climber.getTicks()) >= MAX_POSITION && matchSign(m_axis.get(),
+    // 1)
+    // || matchSign(m_climber.getTicks(), 1)) {
+
+    // this.m_climber.command(this.m_axis.get());
+    // } else {
+    // this.m_climber.command(0.55);
+    // }
+
+    this.m_climber.command(this.m_axis.get());
+
+    SmartDashboard.putNumber("ticks", this.m_climber.getTicks());
+  }
+
+  public boolean matchSign(double input, double sign) {
+    return input == Math.copySign(input, sign);
   }
 
   // Called once the command ends or is interrupted.
